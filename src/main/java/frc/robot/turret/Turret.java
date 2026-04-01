@@ -1,16 +1,9 @@
 package frc.robot.turret;
 
 import org.littletonrobotics.junction.AutoLog;
-
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
-import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkSim;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,7 +11,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.util.VelocityPIDController;
@@ -29,6 +21,7 @@ public class Turret {
     private TurretIO io;
 
     private Turret() {
+        inputs = new TurretInputsAutoLogged();
         io = Constants.IS_SIM ? new TurretIOSimulated() : new TurretIOSparkMax();
     }
 
@@ -41,13 +34,30 @@ public class Turret {
 
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.processInputs(Constants.IS_SIM ? "Turret_SIM" : "Turret_REAL", inputs);
         io.periodic();
+    }
+
+    public void setGains() {
+        io.setGains();
     }
 
     public void setTurretParameters(TurretParameter params) {
         io.setSwivelPosition(params.swivelRad);
         io.setHoodPosition(params.hoodRad);
         io.setFlywheelRPS(params.shotRPS);
+    }
+
+    public void setSwivelPosition(Rotation2d position) {
+        io.setSwivelPosition(position);
+    }
+
+    public void setHoodPosition(Rotation2d position) {
+        io.setHoodPosition(position);
+    }
+
+    public void setFlywheelRPS(double rps) {
+        io.setFlywheelRPS(rps);
     }
 
     public void shootBall() {
@@ -98,6 +108,9 @@ interface TurretIO {
     public default void updateInputs(TurretInputs inputs) {
     }
 
+    public default void setGains() {
+    }
+
     public default void setSwivelPosition(Rotation2d position) {
     }
 
@@ -127,30 +140,32 @@ interface TurretIO {
 }
 
 class TurretIOSparkMax implements TurretIO {
-    private TalonSRX swivelMotor;
-    private TalonSRXConfiguration swivelConfig;
-    private TalonSRX hoodMotor;
-    private TalonSRXConfiguration hoodConfig;
-    private SparkMax flywheelMotor;
-    private SparkMaxConfig flywheelConfig;
+    // private TalonSRX swivelMotor;
+    // private TalonSRXConfiguration swivelConfig;
+    // private TalonSRX hoodMotor;
+    // private TalonSRXConfiguration hoodConfig;
+    // private SparkMax flywheelMotor;
+    // private SparkMaxConfig flywheelConfig;
 
-    public TurretIOSparkMax() {
-        swivelMotor = new TalonSRX(Constants.TurretConstants.SWIVEL_MOTOR_ID);
-        swivelConfig = new TalonSRXConfiguration();
+    // public TurretIOSparkMax() {
+    // swivelMotor = new TalonSRX(Constants.TurretConstants.SWIVEL_MOTOR_ID);
+    // swivelConfig = new TalonSRXConfiguration();
 
-        swivelConfig.slot0.kP = TurretConstants.SWIVEL_KP;
-        swivelConfig.slot0.kI = TurretConstants.SWIVEL_KI;
-        swivelConfig.slot0.kD = TurretConstants.SWIVEL_KD;
+    // swivelConfig.slot0.kP = TurretConstants.SWIVEL_KP;
+    // swivelConfig.slot0.kI = TurretConstants.SWIVEL_KI;
+    // swivelConfig.slot0.kD = TurretConstants.SWIVEL_KD;
 
-        swivelConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative;
+    // swivelConfig.primaryPID.selectedFeedbackSensor =
+    // FeedbackDevice.CTRE_MagEncoder_Relative;
 
-        swivelMotor.configAllSettings(swivelConfig);
+    // swivelMotor.configAllSettings(swivelConfig);
 
-        hoodMotor = new TalonSRX(Constants.TurretConstants.HOOD_MOTOR_ID);
-        hoodConfig = new TalonSRXConfiguration();
-        flywheelMotor = new SparkMax(Constants.TurretConstants.FLYWHEEL_MOTOR_ID, SparkMax.MotorType.kBrushless);
-        flywheelConfig = new SparkMaxConfig();
-    }
+    // hoodMotor = new TalonSRX(Constants.TurretConstants.HOOD_MOTOR_ID);
+    // hoodConfig = new TalonSRXConfiguration();
+    // flywheelMotor = new SparkMax(Constants.TurretConstants.FLYWHEEL_MOTOR_ID,
+    // SparkMax.MotorType.kBrushless);
+    // flywheelConfig = new SparkMaxConfig();
+    // }
 
 }
 
@@ -160,6 +175,16 @@ class TurretIOSimulated implements TurretIO {
 
     private DCMotor flywheelMotorPlant;
     private DCMotor swivelMotorPlant;
+
+    private LoggedNetworkNumber flywheelkP;
+    private LoggedNetworkNumber flywheelkI;
+    private LoggedNetworkNumber flywheelkD;
+    private LoggedNetworkNumber flywheelkS;
+    private LoggedNetworkNumber flywheelkV;
+
+    private LoggedNetworkNumber swivelkP;
+    private LoggedNetworkNumber swivelkI;
+    private LoggedNetworkNumber swivelkD;
 
     private VelocityPIDController flywheelPID;
     private PIDController swivelPID;
@@ -176,14 +201,32 @@ class TurretIOSimulated implements TurretIO {
         ballSim.setFlywheelSim(flywheelSim);
         flywheelSim = new FlywheelSim(
                 LinearSystemId.createFlywheelSystem(flywheelMotorPlant, TurretConstants.FLYWHEEL_MOMENT_OF_INERTIA, 1),
-                flywheelMotorPlant, 0.02);
+                flywheelMotorPlant, 0.08);
         swivelSim = new DCMotorSim(
-                LinearSystemId.createDCMotorSystem(swivelMotorPlant, TurretConstants.SWIVEL_MOMENT_OF_INERTIA, 0.001),
-                swivelMotorPlant, 0.02);
+                LinearSystemId.createDCMotorSystem(swivelMotorPlant, TurretConstants.SWIVEL_MOMENT_OF_INERTIA, 100),
+                swivelMotorPlant, 0.0, 0.0);
         flywheelPID = new VelocityPIDController(TurretConstants.SIM_FLYWHEEL_KP, TurretConstants.SIM_FLYWHEEL_KI,
                 TurretConstants.SIM_FLYWHEEL_KD, TurretConstants.SIM_FLYWHEEL_KS, TurretConstants.SIM_FLYWHEEL_KV);
         swivelPID = new PIDController(TurretConstants.SIM_SWIVEL_KP, TurretConstants.SIM_SWIVEL_KI,
                 TurretConstants.SIM_SWIVEL_KD);
+
+        flywheelkP = new LoggedNetworkNumber("TurretSim/flywheelKP", TurretConstants.SIM_FLYWHEEL_KP);
+        flywheelkI = new LoggedNetworkNumber("TurretSim/flywheelKI", TurretConstants.SIM_FLYWHEEL_KI);
+        flywheelkD = new LoggedNetworkNumber("TurretSim/flywheelKD", TurretConstants.SIM_FLYWHEEL_KD);
+        flywheelkS = new LoggedNetworkNumber("TurretSim/flywheelKS", TurretConstants.SIM_FLYWHEEL_KS);
+        flywheelkV = new LoggedNetworkNumber("TurretSim/flywheelKV", TurretConstants.SIM_FLYWHEEL_KV);
+
+        swivelkP = new LoggedNetworkNumber("TurretSim/swivelKP", TurretConstants.SIM_SWIVEL_KP);
+        swivelkI = new LoggedNetworkNumber("TurretSim/swivelKI", TurretConstants.SIM_SWIVEL_KI);
+        swivelkD = new LoggedNetworkNumber("TurretSim/swivelKD", TurretConstants.SIM_SWIVEL_KD);
+    }
+
+    @Override
+    public void setGains() {
+        flywheelPID.setGains(flywheelkP.get(), flywheelkI.get(), flywheelkD.get(), flywheelkS.get(), flywheelkV.get());
+        swivelPID.setP(swivelkP.get());
+        swivelPID.setI(swivelkI.get());
+        swivelPID.setD(swivelkD.get());
     }
 
     @Override
@@ -226,7 +269,7 @@ class TurretIOSimulated implements TurretIO {
 
     @Override
     public void periodic() {
-        double swivelOutput = swivelPID.calculate(swivelSim.getAngularPositionRotations());
+        double swivelOutput = swivelPID.calculate(swivelSim.getAngularPositionRad());
         swivelSim.setInput(swivelOutput);
         double flywheelOutput = flywheelPID.calculate(flywheelSim.getAngularVelocityRPM() / 60.0);
         flywheelSim.setInput(flywheelOutput);
@@ -237,7 +280,7 @@ class TurretIOSimulated implements TurretIO {
 
     @Override
     public void updateInputs(TurretInputs inputs) {
-        inputs.swivelPosition = swivelSim.getAngularPositionRotations();
+        inputs.swivelPosition = swivelSim.getAngularPositionRad();
         inputs.swivelVelocity = swivelSim.getAngularVelocityRPM() / 60.0;
         inputs.hoodPosition = hoodPosition.getRadians();
         inputs.flywheelVelocity = flywheelSim.getAngularVelocityRPM() / 60.0;

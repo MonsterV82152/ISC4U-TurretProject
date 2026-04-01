@@ -8,10 +8,6 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
@@ -26,6 +22,7 @@ public class Robot extends LoggedRobot {
    */
   public Robot() {
     m_robotContainer = new RobotContainer();
+    Logger.recordOutput("hi", true);
     switch (Constants.ROBOT_MODE) {
             case REAL:
                 // Running on a real robot, log to a USB stick ("/U/logs")
@@ -47,6 +44,7 @@ public class Robot extends LoggedRobot {
                 // "_sim")));
                 break;
         }
+        Logger.start();
   }
 
   /**

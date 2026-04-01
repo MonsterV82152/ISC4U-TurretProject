@@ -1,8 +1,7 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
-
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 
 public final class Constants {
     enum Mode {
@@ -22,7 +21,7 @@ public final class Constants {
         public static final double SWIVEL_KI = 0.0;
         public static final double SWIVEL_KD = 0.0;
 
-        public static final double SIM_SWIVEL_KP = 0.1;
+        public static final double SIM_SWIVEL_KP = 50.0;
         public static final double SIM_SWIVEL_KI = 0.0;
         public static final double SIM_SWIVEL_KD = 0.0;
 
@@ -36,27 +35,26 @@ public final class Constants {
         public static final double FLYWHEEL_KS = 0.0;
         public static final double FLYWHEEL_KV = 0.0;
 
-        public static final double SIM_FLYWHEEL_KP = 0.1;
+        public static final double SIM_FLYWHEEL_KP = 0.0;
         public static final double SIM_FLYWHEEL_KI = 0.0;
         public static final double SIM_FLYWHEEL_KD = 0.0;
         public static final double SIM_FLYWHEEL_KS = 0.0;
-        public static final double SIM_FLYWHEEL_KV = 0.0;
+        public static final double SIM_FLYWHEEL_KV = 0.06454;
 
         public static final double FLYWHEEL_RPS_TOLERANCE = 0.1;
 
         public static final int HOOD_MOTOR_ID = 2;
 
-        public static final double FLYWHEEL_MOMENT_OF_INERTIA = 7.3161144E-5;
+        public static final double FLYWHEEL_RADIUS_METERS = Units.inchesToMeters(1); // 1 inch in meters
+        public static final double FLYWHEEL_MOMENT_OF_INERTIA = 0.00014632;
         public static final double SWIVEL_MOMENT_OF_INERTIA = 0.00395063532;
+
     }
 
     public final class BallSimConstants {
         // Ball physical properties
         public static final double BALL_MASS_KG = 0.27; // Mass of a typical game ball (e.g., cargo ball)
         public static final double BALL_RADIUS_METERS = 0.12; // Radius of the ball
-
-        // Flywheel properties for energy transfer
-        public static final double FLYWHEEL_RADIUS_METERS = 0.0254; // 1 inch in meters
 
         // Simulation properties
         public static final double BALL_LIFETIME_SECONDS = 5.0; // How long a ball stays in simulation

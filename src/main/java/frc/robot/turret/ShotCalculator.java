@@ -15,7 +15,7 @@ public class ShotCalculator {
 
     private static final double FLYWHEEL_RADIUS = Units.inchesToMeters(1); // 1 inches in meters
 
-    private static Translation3d target = new Translation3d(0, 2, 5); // Example target position (x, y, z)
+    private static Translation3d target = new Translation3d(2, 1, 2); // Example target position (x, y, z)
 
     public static void setTarget(Translation3d newTarget) {
         Logger.recordOutput("Target", newTarget);
@@ -26,12 +26,12 @@ public class ShotCalculator {
         if (Constants.IS_SIM) {
             return shotVelocity / (2 * Math.PI * FLYWHEEL_RADIUS) / 2;
         }
-        return shotVelocity / (2 * Math.PI * FLYWHEEL_RADIUS) / 2 * SLIP_FACTOR;
+        return shotVelocity / (2 * Math.PI * FLYWHEEL_RADIUS) * 2 * SLIP_FACTOR;
     }
-
+    
     public static TurretParameter calculateShot() {
-        Translation2d target2D = new Translation2d(Math.hypot(target.getX(), target.getZ()), target.getY());
-        Rotation2d yaw = new Rotation2d(target.getX(), target.getZ());
+        Translation2d target2D = new Translation2d(Math.hypot(target.getX(), target.getY()), target.getZ());
+        Rotation2d yaw = new Rotation2d(target.getY(), target.getX());
 
         if (Constants.IS_SIM) {
             double Ty = target2D.getY();

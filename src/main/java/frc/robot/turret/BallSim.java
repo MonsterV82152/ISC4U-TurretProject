@@ -14,7 +14,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 import frc.robot.Constants.BallSimConstants;
-import frc.robot.Constants.TurretConstants;
 
 public class BallSim {
     private static BallSim instance;
@@ -52,21 +51,23 @@ public class BallSim {
         }
 
         // Calculate initial velocity from flywheel RPS
-        double shotVelocity = flywheelRPS * 2 * Math.PI * BallSimConstants.FLYWHEEL_RADIUS_METERS;
+        double shotVelocity = flywheelRPS * 2 * Math.PI * Constants.TurretConstants.FLYWHEEL_RADIUS_METERS;
 
         // Calculate velocity components based on hood and swivel angles
+        // Coordinate system: X = Left(+)/Right(-), Y = Forward(+)/Backward(-), Z = Up(+)/Down(-)
         double vHorizontal = shotVelocity * Math.cos(hoodAngle.getRadians());
         double vVertical = shotVelocity * Math.sin(hoodAngle.getRadians());
 
-        double vx = vHorizontal * Math.cos(swivelAngle.getRadians());
-        double vz = vHorizontal * Math.sin(swivelAngle.getRadians());
-        double vy = vVertical;
+        double vx = vHorizontal * Math.sin(swivelAngle.getRadians());  // Left/Right
+        double vy = vHorizontal * Math.cos(swivelAngle.getRadians());  // Forward/Backward
+        double vz = vVertical;                                          // Up/Down
 
         // Spawn position at turret location
         Translation3d spawnPosition = new Translation3d(
-                BallSimConstants.TURRET_FORWARD_OFFSET_METERS * Math.cos(swivelAngle.getRadians()),
-                BallSimConstants.TURRET_HEIGHT_METERS,
-                BallSimConstants.TURRET_FORWARD_OFFSET_METERS * Math.sin(swivelAngle.getRadians()));
+                BallSimConstants.TURRET_FORWARD_OFFSET_METERS * Math.sin(swivelAngle.getRadians()),  // X: Left/Right
+                BallSimConstants.TURRET_FORWARD_OFFSET_METERS * Math.cos(swivelAngle.getRadians()),  // Y: Forward
+                BallSimConstants.TURRET_HEIGHT_METERS                                                 // Z: Height
+        );
 
         Translation3d initialVelocity = new Translation3d(vx, vy, vz);
 
@@ -87,7 +88,7 @@ public class BallSim {
 
         // Convert to angular momentum loss on flywheel
         // L = p * r, where r is the flywheel radius
-        double angularMomentumLoss = ballMomentum * BallSimConstants.FLYWHEEL_RADIUS_METERS;
+        double angularMomentumLoss = ballMomentum * Constants.TurretConstants.FLYWHEEL_RADIUS_METERS;
 
         // Calculate velocity loss: ΔL = I * Δω
         double flywheelInertia = Constants.TurretConstants.FLYWHEEL_MOMENT_OF_INERTIA;
@@ -114,8 +115,8 @@ public class BallSim {
             SimulatedBall ball = iterator.next();
             ball.update(dt);
 
-            // Remove balls that have expired or fallen below ground
-            if (ball.isExpired() || ball.getPosition().getY() < -1.0) {
+            // Remove balls that have expired or fallen below ground (Z < 0)
+            if (ball.isExpired() || ball.getPosition().getZ() < -1.0) {
                 iterator.remove();
             }
         }
@@ -128,10 +129,10 @@ public class BallSim {
      * Logs all ball positions to AdvantageScope for visualization
      */
     private void logBalls() {
-        Pose3d[] ballPoses = new Pose3d[balls.size()];
+        Translation3d[] ballPoses = new Translation3d[balls.size()];
         for (int i = 0; i < balls.size(); i++) {
             SimulatedBall ball = balls.get(i);
-            ballPoses[i] = new Pose3d(ball.getPosition(), new Rotation3d());
+            ballPoses[i] = ball.getPosition();
         }
 
         Logger.recordOutput("BallSim/Balls", ballPoses);
@@ -169,6 +170,7 @@ class SimulatedBall {
 
     /**
      * Updates the ball position using basic projectile motion (no air resistance)
+     * Coordinate system: X = Left(+)/Right(-), Y = Forward(+)/Backward(-), Z = Up(+)/Down(-)
      * 
      * @param dt Time step in seconds
      */
@@ -179,11 +181,11 @@ class SimulatedBall {
                 position.getY() + velocity.getY() * dt,
                 position.getZ() + velocity.getZ() * dt);
 
-        // Update velocity (only gravity affects Y component)
+        // Update velocity (only gravity affects Z component - up/down)
         velocity = new Translation3d(
                 velocity.getX(),
-                velocity.getY() + BallSimConstants.GRAVITY * dt,
-                velocity.getZ());
+                velocity.getY(),
+                velocity.getZ() + BallSimConstants.GRAVITY * dt);
 
         lifetime += dt;
     }
