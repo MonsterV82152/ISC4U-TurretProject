@@ -194,14 +194,15 @@ class TurretIOSimulated implements TurretIO {
     private BallSim ballSim;
 
     public TurretIOSimulated() {
+        ballSim = BallSim.getInstance();
         flywheelMotorPlant = DCMotor.getNeo550(1);
         swivelMotorPlant = DCMotor.getNeo550(1);
         hoodPosition = Rotation2d.kZero;
-        ballSim = BallSim.getInstance();
-        ballSim.setFlywheelSim(flywheelSim);
         flywheelSim = new FlywheelSim(
                 LinearSystemId.createFlywheelSystem(flywheelMotorPlant, TurretConstants.FLYWHEEL_MOMENT_OF_INERTIA, 1),
-                flywheelMotorPlant, 0.08);
+                flywheelMotorPlant, 8.0);
+        ballSim.setFlywheelSim(flywheelSim);
+        
         swivelSim = new DCMotorSim(
                 LinearSystemId.createDCMotorSystem(swivelMotorPlant, TurretConstants.SWIVEL_MOMENT_OF_INERTIA, 100),
                 swivelMotorPlant, 0.0, 0.0);

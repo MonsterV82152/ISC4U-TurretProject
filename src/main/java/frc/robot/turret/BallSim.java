@@ -51,21 +51,21 @@ public class BallSim {
         }
 
         // Calculate initial velocity from flywheel RPS
-        double shotVelocity = flywheelRPS * 2 * Math.PI * Constants.TurretConstants.FLYWHEEL_RADIUS_METERS;
+        double shotVelocity = flywheelRPS * Math.PI * Constants.TurretConstants.FLYWHEEL_RADIUS_METERS;
 
         // Calculate velocity components based on hood and swivel angles
         // Coordinate system: X = Left(+)/Right(-), Y = Forward(+)/Backward(-), Z = Up(+)/Down(-)
-        double vHorizontal = shotVelocity * Math.cos(hoodAngle.getRadians());
-        double vVertical = shotVelocity * Math.sin(hoodAngle.getRadians());
+        double vHorizontal = shotVelocity * hoodAngle.getCos(); // Horizontal component based on hood angle
+        double vVertical = shotVelocity * hoodAngle.getSin();   // Vertical component based on hood angle
 
-        double vx = vHorizontal * Math.sin(swivelAngle.getRadians());  // Left/Right
-        double vy = vHorizontal * Math.cos(swivelAngle.getRadians());  // Forward/Backward
-        double vz = vVertical;                                          // Up/Down
+        double vx = vHorizontal * swivelAngle.getSin();  // Left/Right
+        double vy = vHorizontal * swivelAngle.getCos();  // Forward/Backward
+        double vz = vVertical;                            // Up/Down
 
         // Spawn position at turret location
         Translation3d spawnPosition = new Translation3d(
-                BallSimConstants.TURRET_FORWARD_OFFSET_METERS * Math.sin(swivelAngle.getRadians()),  // X: Left/Right
-                BallSimConstants.TURRET_FORWARD_OFFSET_METERS * Math.cos(swivelAngle.getRadians()),  // Y: Forward
+                BallSimConstants.TURRET_FORWARD_OFFSET_METERS * swivelAngle.getSin(),  // X: Left/Right
+                BallSimConstants.TURRET_FORWARD_OFFSET_METERS * swivelAngle.getCos(),  // Y: Forward
                 BallSimConstants.TURRET_HEIGHT_METERS                                                 // Z: Height
         );
 

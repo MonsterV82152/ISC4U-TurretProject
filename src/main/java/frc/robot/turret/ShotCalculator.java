@@ -10,10 +10,8 @@ import frc.robot.Constants;
 
 public class ShotCalculator {
     private static final double GRAVITY = -9.81;
-    private static final double MIN_Y_VELOCITY = 2;
+    private static final double MIN_Y_VELOCITY = 4;
     private static final double SLIP_FACTOR = 1.0; // Adjust this based on empirical testing
-
-    private static final double FLYWHEEL_RADIUS = Units.inchesToMeters(1); // 1 inches in meters
 
     private static Translation3d target = new Translation3d(2, 1, 2); // Example target position (x, y, z)
 
@@ -24,9 +22,9 @@ public class ShotCalculator {
 
     public static double calculateFlywheelRPS(double shotVelocity) {
         if (Constants.IS_SIM) {
-            return shotVelocity / (2 * Math.PI * FLYWHEEL_RADIUS) / 2;
+            return shotVelocity / (2 * Math.PI * Constants.TurretConstants.FLYWHEEL_RADIUS_METERS) * 2;
         }
-        return shotVelocity / (2 * Math.PI * FLYWHEEL_RADIUS) * 2 * SLIP_FACTOR;
+        return shotVelocity / (2 * Math.PI * Constants.TurretConstants.FLYWHEEL_RADIUS_METERS) * 2 * SLIP_FACTOR;
     }
     
     public static TurretParameter calculateShot() {

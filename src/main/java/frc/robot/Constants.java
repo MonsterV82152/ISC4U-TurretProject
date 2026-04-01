@@ -35,7 +35,7 @@ public final class Constants {
         public static final double FLYWHEEL_KS = 0.0;
         public static final double FLYWHEEL_KV = 0.0;
 
-        public static final double SIM_FLYWHEEL_KP = 0.0;
+        public static final double SIM_FLYWHEEL_KP = 0.5;
         public static final double SIM_FLYWHEEL_KI = 0.0;
         public static final double SIM_FLYWHEEL_KD = 0.0;
         public static final double SIM_FLYWHEEL_KS = 0.0;
@@ -53,16 +53,16 @@ public final class Constants {
 
     public final class BallSimConstants {
         // Ball physical properties
-        public static final double BALL_MASS_KG = 0.27; // Mass of a typical game ball (e.g., cargo ball)
-        public static final double BALL_RADIUS_METERS = 0.12; // Radius of the ball
+        public static final double BALL_MASS_KG = 0.11339809; // Mass of a typical game ball (e.g., cargo ball)
+        public static final double BALL_RADIUS_METERS = Units.inchesToMeters(2); // Radius of the ball
 
         // Simulation properties
         public static final double BALL_LIFETIME_SECONDS = 5.0; // How long a ball stays in simulation
-        public static final int MAX_BALLS = 10; // Maximum number of balls to simulate at once
+        public static final int MAX_BALLS = 60; // Maximum number of balls to simulate at once
 
         // Turret position offset (where the ball spawns relative to robot origin)
-        public static final double TURRET_HEIGHT_METERS = 0.5; // Height of turret from ground
-        public static final double TURRET_FORWARD_OFFSET_METERS = 0.3; // Forward offset from robot center
+        public static final double TURRET_HEIGHT_METERS = 0.0; // Height of turret from ground
+        public static final double TURRET_FORWARD_OFFSET_METERS = 0.0; // Forward offset from robot center
 
         // Physics
         public static final double GRAVITY = -9.81; // m/s^2

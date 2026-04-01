@@ -15,9 +15,9 @@ public class RobotContainer {
     // Subsystems
     private final Turret turret;
 
-    LoggedNetworkNumber targetX;
-    LoggedNetworkNumber targetY;
-    LoggedNetworkNumber targetZ;
+    private LoggedNetworkNumber targetX;
+    private LoggedNetworkNumber targetY;
+    private LoggedNetworkNumber targetZ;
 
     // Controller
     private final XboxController controller = new XboxController(0);
@@ -47,39 +47,39 @@ public class RobotContainer {
             ShotCalculator.setTarget(new Translation3d(x, y, z));
         }
         // if (controller.getBButtonPressed()) {
-        //     States.RobotState.turretState = States.RobotState.TurretState.MANUAL;
+        // States.RobotState.turretState = States.RobotState.TurretState.MANUAL;
         // }
         // if (controller.getYButtonPressed()) {
-        //     States.RobotState.turretState = States.RobotState.TurretState.AIMING;
+        // States.RobotState.turretState = States.RobotState.TurretState.AIMING;
         // }
 
         // if (controller.getAButtonPressed()) {
-        //     turret.setGains();
-        //     turret.setFlywheelRPS(150);
+        // turret.setGains();
+        // turret.setFlywheelRPS(150);
         // }
         // if (controller.getBButtonPressed()) {
-        //     turret.setGains();
-        //     turret.setFlywheelRPS(20);
+        // turret.setGains();
+        // turret.setFlywheelRPS(20);
         // }
         // if (controller.getAButtonReleased() || controller.getBButtonReleased()) {
-        //     turret.setFlywheelRPS(0);
+        // turret.setFlywheelRPS(0);
         // }
 
         // if (controller.getAButtonPressed()) {
-        //     turret.setGains();
-        //     turret.setSwivelPosition(Rotation2d.fromDegrees(0));
+        // turret.setGains();
+        // turret.setSwivelPosition(Rotation2d.fromDegrees(0));
         // }
         // if (controller.getBButtonPressed()) {
-        //     turret.setGains();
-        //     turret.setSwivelPosition(Rotation2d.fromDegrees(90));
+        // turret.setGains();
+        // turret.setSwivelPosition(Rotation2d.fromDegrees(90));
         // }
         // if (controller.getXButtonPressed()) {
-        //     turret.setGains();
-        //     turret.setSwivelPosition(Rotation2d.fromDegrees(180));
+        // turret.setGains();
+        // turret.setSwivelPosition(Rotation2d.fromDegrees(180));
         // }
         // if (controller.getYButtonPressed()) {
-        //     turret.setGains();
-        //     turret.setSwivelPosition(Rotation2d.fromDegrees(270));
+        // turret.setGains();
+        // turret.setSwivelPosition(Rotation2d.fromDegrees(270));
         // }
     }
 
@@ -93,6 +93,7 @@ public class RobotContainer {
         turret.periodic();
         if (States.RobotState.turretState == States.RobotState.TurretState.AIMING) {
             turret.setTurretParameters(ShotCalculator.calculateShot());
+            turret.setGains();
         }
     }
 }
