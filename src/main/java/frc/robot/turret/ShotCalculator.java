@@ -1,9 +1,12 @@
-package frc.robot;
+package frc.robot.turret;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
 
 public class ShotCalculator {
     private static final double GRAVITY = -9.81;
@@ -12,6 +15,13 @@ public class ShotCalculator {
 
     private static final double FLYWHEEL_RADIUS = Units.inchesToMeters(1); // 1 inches in meters
 
+    private static Translation3d target = new Translation3d(0, 2, 5); // Example target position (x, y, z)
+
+    public static void setTarget(Translation3d newTarget) {
+        Logger.recordOutput("Target", newTarget);
+        target = newTarget;
+    }
+
     public static double calculateFlywheelRPS(double shotVelocity) {
         if (Constants.IS_SIM) {
             return shotVelocity / (2 * Math.PI * FLYWHEEL_RADIUS) / 2;
@@ -19,7 +29,7 @@ public class ShotCalculator {
         return shotVelocity / (2 * Math.PI * FLYWHEEL_RADIUS) / 2 * SLIP_FACTOR;
     }
 
-    public static TurretParameter calculateShot(Translation3d target) {
+    public static TurretParameter calculateShot() {
         Translation2d target2D = new Translation2d(Math.hypot(target.getX(), target.getZ()), target.getY());
         Rotation2d yaw = new Rotation2d(target.getX(), target.getZ());
 

@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.turret;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -19,7 +19,9 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
+import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.util.VelocityPIDController;
 
 public class Turret {
     private static Turret turretInst;
@@ -27,7 +29,7 @@ public class Turret {
     private TurretIO io;
 
     private Turret() {
-        io = new TurretIOSparkMax();
+        io = Constants.IS_SIM ? new TurretIOSimulated() : new TurretIOSparkMax();
     }
 
     public static Turret getInstance() {
@@ -36,6 +38,38 @@ public class Turret {
         }
         return turretInst;
     }
+
+    public void periodic() {
+        io.updateInputs(inputs);
+        io.periodic();
+    }
+
+    public void setTurretParameters(TurretParameter params) {
+        io.setSwivelPosition(params.swivelRad);
+        io.setHoodPosition(params.hoodRad);
+        io.setFlywheelRPS(params.shotRPS);
+    }
+
+    public void shootBall() {
+        io.shootBall();
+    }
+
+    public boolean isAtSwivelPosition() {
+        return io.isAtSwivelPosition();
+    }
+
+    public boolean isAtHoodPosition() {
+        return io.isAtHoodPosition();
+    }
+
+    public boolean isAtFlywheelRPS() {
+        return io.isAtFlywheelRPS();
+    }
+
+    public boolean isReadyToShoot() {
+        return isAtSwivelPosition() && isAtHoodPosition() && isAtFlywheelRPS();
+    }
+
 }
 
 interface TurretIO {
@@ -71,6 +105,9 @@ interface TurretIO {
     }
 
     public default void setFlywheelRPS(double rps) {
+    }
+
+    public default void shootBall() {
     }
 
     public default boolean isAtSwivelPosition() {
@@ -129,17 +166,14 @@ class TurretIOSimulated implements TurretIO {
 
     private Rotation2d hoodPosition;
 
-    // private SparkBase flyWheelMotorBase;
-    // private SparkSim flywheelMotorSim;
-    // private SparkSim swivelMotorSim;
+    private BallSim ballSim;
 
     public TurretIOSimulated() {
         flywheelMotorPlant = DCMotor.getNeo550(1);
         swivelMotorPlant = DCMotor.getNeo550(1);
         hoodPosition = Rotation2d.kZero;
-        // flyWheelMotorBase = new SparkMax(Constants.TurretConstants.SWIVEL_MOTOR_ID,
-        // SparkMax.MotorType.kBrushless);
-        // flywheelMotorSim = new SparkSim(flyWheelMotorBase, flywheelMotorPlant);
+        ballSim = BallSim.getInstance();
+        ballSim.setFlywheelSim(flywheelSim);
         flywheelSim = new FlywheelSim(
                 LinearSystemId.createFlywheelSystem(flywheelMotorPlant, TurretConstants.FLYWHEEL_MOMENT_OF_INERTIA, 1),
                 flywheelMotorPlant, 0.02);
@@ -168,13 +202,21 @@ class TurretIOSimulated implements TurretIO {
     }
 
     @Override
+    public void shootBall() {
+        ballSim.shootBall(hoodPosition, Rotation2d.fromRadians(swivelSim.getAngularPositionRad()),
+                flywheelSim.getAngularVelocityRPM() / 60.0);
+    }
+
+    @Override
     public boolean isAtSwivelPosition() {
-        return Math.abs(swivelPID.getSetpoint() - swivelSim.getAngularPositionRotations()) < Constants.TurretConstants.SWIVEL_TOLERANCE.getRadians();
+        return Math.abs(swivelPID.getSetpoint()
+                - swivelSim.getAngularPositionRotations()) < Constants.TurretConstants.SWIVEL_TOLERANCE.getRadians();
     }
 
     @Override
     public boolean isAtFlywheelRPS() {
-        return Math.abs(flywheelPID.getSetpoint() - flywheelSim.getAngularVelocityRPM() / 60.0) < Constants.TurretConstants.FLYWHEEL_RPS_TOLERANCE;
+        return Math.abs(flywheelPID.getSetpoint()
+                - flywheelSim.getAngularVelocityRPM() / 60.0) < Constants.TurretConstants.FLYWHEEL_RPS_TOLERANCE;
     }
 
     @Override
@@ -190,6 +232,7 @@ class TurretIOSimulated implements TurretIO {
         flywheelSim.setInput(flywheelOutput);
         flywheelSim.update(Constants.LOOP_PERIOD);
         swivelSim.update(Constants.LOOP_PERIOD);
+        ballSim.periodic();
     }
 
     @Override
