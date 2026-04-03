@@ -195,12 +195,13 @@ class TurretIOSimulated implements TurretIO {
 
     public TurretIOSimulated() {
         ballSim = BallSim.getInstance();
-        flywheelMotorPlant = DCMotor.getNeo550(1);
+        flywheelMotorPlant = DCMotor.getKrakenX60Foc(2);
         swivelMotorPlant = DCMotor.getNeo550(1);
         hoodPosition = Rotation2d.kZero;
         flywheelSim = new FlywheelSim(
                 LinearSystemId.createFlywheelSystem(flywheelMotorPlant, TurretConstants.FLYWHEEL_MOMENT_OF_INERTIA, 1),
-                flywheelMotorPlant, 8.0);
+                flywheelMotorPlant, 0.01);
+        Logger.recordOutput("FLywheel MOI", TurretConstants.FLYWHEEL_MOMENT_OF_INERTIA);
         ballSim.setFlywheelSim(flywheelSim);
         
         swivelSim = new DCMotorSim(
@@ -274,6 +275,7 @@ class TurretIOSimulated implements TurretIO {
         swivelSim.setInput(swivelOutput);
         double flywheelOutput = flywheelPID.calculate(flywheelSim.getAngularVelocityRPM() / 60.0);
         flywheelSim.setInput(flywheelOutput);
+
         flywheelSim.update(Constants.LOOP_PERIOD);
         swivelSim.update(Constants.LOOP_PERIOD);
         ballSim.periodic();

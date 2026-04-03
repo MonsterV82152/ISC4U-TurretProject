@@ -37,15 +37,15 @@ public class RobotContainer {
     }
 
     public void teleopPeriodic() {
-        if (controller.getAButtonPressed()) {
-            turret.shootBall();
-        }
-        if (controller.getBButton()) {
-            double x = targetX.get();
-            double y = targetY.get();
-            double z = targetZ.get();
-            ShotCalculator.setTarget(new Translation3d(x, y, z));
-        }
+        // if (controller.getAButtonPressed()) {
+        //     turret.shootBall();
+        // }
+        // if (controller.getBButton()) {
+        //     double x = targetX.get();
+        //     double y = targetY.get();
+        //     double z = targetZ.get();
+        //     ShotCalculator.setTarget(new Translation3d(x, y, z));
+        // }
         // if (controller.getBButtonPressed()) {
         // States.RobotState.turretState = States.RobotState.TurretState.MANUAL;
         // }
@@ -53,17 +53,17 @@ public class RobotContainer {
         // States.RobotState.turretState = States.RobotState.TurretState.AIMING;
         // }
 
-        // if (controller.getAButtonPressed()) {
-        // turret.setGains();
-        // turret.setFlywheelRPS(150);
-        // }
-        // if (controller.getBButtonPressed()) {
-        // turret.setGains();
-        // turret.setFlywheelRPS(20);
-        // }
-        // if (controller.getAButtonReleased() || controller.getBButtonReleased()) {
-        // turret.setFlywheelRPS(0);
-        // }
+        if (controller.getAButtonPressed()) {
+        turret.setGains();
+        turret.setFlywheelRPS(80);
+        }
+        if (controller.getBButtonPressed()) {
+        turret.setGains();
+        turret.setFlywheelRPS(10);
+        }
+        if (controller.getAButtonReleased() || controller.getBButtonReleased()) {
+        turret.setFlywheelRPS(0);
+        }
 
         // if (controller.getAButtonPressed()) {
         // turret.setGains();

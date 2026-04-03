@@ -5,6 +5,6 @@ public class States {
         public enum TurretState {
             IDLE, MANUAL, AIMING
         }
-        public static TurretState turretState = TurretState.AIMING;
+        public static TurretState turretState = TurretState.MANUAL;
     }
 }
