@@ -6,8 +6,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.EventLoop;
-import frc.robot.turret.ShotCalculator;
 import frc.robot.turret.Turret;
+import frc.robot.util.ShotCalculator;
 import frc.robot.util.States;
 
 public class RobotContainer {
@@ -37,15 +37,15 @@ public class RobotContainer {
     }
 
     public void teleopPeriodic() {
-        if (controller.getAButtonPressed()) {
-            turret.shootBall();
-        }
-        if (controller.getBButton()) {
-            double x = targetX.get();
-            double y = targetY.get();
-            double z = targetZ.get();
-            ShotCalculator.setTarget(new Translation3d(x, y, z));
-        }
+        // if (controller.getAButtonPressed()) {
+        //     turret.shootBall();
+        // }
+        // if (controller.getBButton()) {
+        //     double x = targetX.get();
+        //     double y = targetY.get();
+        //     double z = targetZ.get();
+        //     ShotCalculator.setTarget(new Translation3d(x, y, z));
+        // }
         // if (controller.getBButtonPressed()) {
         // States.RobotState.turretState = States.RobotState.TurretState.MANUAL;
         // }
@@ -53,17 +53,17 @@ public class RobotContainer {
         // States.RobotState.turretState = States.RobotState.TurretState.AIMING;
         // }
 
-        // if (controller.getAButtonPressed()) {
-        // turret.setGains();
-        // turret.setFlywheelRPS(150);
-        // }
-        // if (controller.getBButtonPressed()) {
-        // turret.setGains();
-        // turret.setFlywheelRPS(20);
-        // }
-        // if (controller.getAButtonReleased() || controller.getBButtonReleased()) {
-        // turret.setFlywheelRPS(0);
-        // }
+        if (controller.getAButtonPressed()) {
+        turret.setGains();
+        turret.setFlywheelRPS(80);
+        }
+        if (controller.getBButtonPressed()) {
+        turret.setGains();
+        turret.setFlywheelRPS(10);
+        }
+        if (controller.getAButtonReleased() || controller.getBButtonReleased()) {
+        turret.setFlywheelRPS(0);
+        }
 
         // if (controller.getAButtonPressed()) {
         // turret.setGains();
