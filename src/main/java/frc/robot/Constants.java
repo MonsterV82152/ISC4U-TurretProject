@@ -52,7 +52,7 @@ public final class Constants {
         // public static final double FLYWHEEL_MOMENT_OF_INERTIA = FLYWHEEL_FLYWHEEL_WEIGHT_KG * FLYWHEEL_RADIUS_METERS * FLYWHEEL_RADIUS_METERS / 2.0 + 2 * METAL_PLATES_FLYWHEEL_WEIGHT_KG * METAL_PLATE_RADIUS_METERS * METAL_PLATE_RADIUS_METERS;
         public static final double FLYWHEEL_MOMENT_OF_INERTIA = 0.0001656946 * 2;
         public static final double SWIVEL_MOMENT_OF_INERTIA = 0.00395063532;
-
+ 
     }
 
     public final class BallSimConstants {

@@ -2,7 +2,6 @@ package frc.robot.turret;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -13,7 +12,9 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.util.TurretParameter;
 import frc.robot.util.VelocityPIDController;
+import frc.robot.util.BallSim;
 
 public class Turret {
     private static Turret turretInst;
