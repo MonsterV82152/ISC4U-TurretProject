@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterUtilConstants;
 
 public class ShotCalculator {
     private static final double GRAVITY = -9.81;
@@ -26,7 +27,7 @@ public class ShotCalculator {
         }
         return shotVelocity / (2 * Math.PI * Constants.TurretConstants.FLYWHEEL_RADIUS_METERS) * 2 * SLIP_FACTOR;
     }
-    
+
     public static TurretParameter calculateShot() {
         Translation2d target2D = new Translation2d(Math.hypot(target.getX(), target.getY()), target.getZ());
         Rotation2d yaw = new Rotation2d(target.getY(), target.getX());
@@ -50,5 +51,15 @@ public class ShotCalculator {
         // Placeholder Math
 
         return new TurretParameter();
+    }
+
+    public static double calculateTurretAngle(double e1, double e2) {
+        e1 *= ShooterUtilConstants.GEAR_1_TOOTH_COUNT / ShooterUtilConstants.GEAR_0_TOOTH_COUNT;
+        e2 *= ShooterUtilConstants.GEAR_2_TOOTH_COUNT / ShooterUtilConstants.GEAR_0_TOOTH_COUNT;
+        return e1 + 33 * ((14 * Math.round((e2 - e1) / 3)) % 17);
+    }
+
+    public static double calculateTurretAngleRelative(double e1) {
+        return e1 * ShooterUtilConstants.GEAR_1_TOOTH_COUNT / ShooterUtilConstants.GEAR_0_TOOTH_COUNT;
     }
 }
